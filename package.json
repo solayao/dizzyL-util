@@ -1,0 +1,27 @@
+{
+  "name": "dizzyl-util",
+  "version": "1.0.0",
+  "description": "dizzyL的个人公共工具包",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "utils"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://test/com"
+  },
+  "author": "dizzyL",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "chalk": "^2.4.1",
+    "fbjs": "^0.8.17",
+    "generic-pool": "^3.4.2",
+    "log4js": "^3.0.4",
+    "mongodb": "^3.1.1",
+    "redis": "^2.8.0"
+  }
+}
