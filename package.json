@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "http://test/com"
+    "url": "https://github.com/solayao/dizzyL-util.git"
   },
   "author": "dizzyL",
   "license": "ISC",
