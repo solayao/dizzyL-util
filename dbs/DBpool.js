@@ -1,6 +1,6 @@
 const genericPool = require('generic-pool');
 const emptyFunc = require('fbjs/lib/emptyFunction');
-const { ErrorConsole, SuccessConsole } = require('../ChalkConsole');
+const { ErrorConsole, SuccessConsole } = require('../log/ChalkConsole');
 /**
  * @description 数据库连接池
  * @git https://github.com/coopernurse/node-pool

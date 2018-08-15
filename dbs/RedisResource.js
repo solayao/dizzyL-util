@@ -4,7 +4,7 @@ bluebird.promisifyAll(Redis);
 
 const DBpool = require('./DBpool');
 const { redisConfig } = require('./config.json');
-const { SuccessConsole, ErrorConsole } = require('../ChalkConsole');
+const { SuccessConsole, ErrorConsole } = require('../log/ChalkConsole');
 
 /**
  * @description Redis连接池

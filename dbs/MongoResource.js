@@ -2,7 +2,7 @@ const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 const DBpool = require('./DBpool');
 const { mongoConfig } = require('./config.json');
-const { SuccessConsole, ErrorConsole, InsertConsole } = require('../ChalkConsole');
+const { SuccessConsole, ErrorConsole, InsertConsole } = require('../log/ChalkConsole');
 
 const dbName = mongoConfig.db;
 
@@ -149,7 +149,6 @@ class MongoResource {
     }
 
 }
-
 
 module.exports = MongoResource;
 

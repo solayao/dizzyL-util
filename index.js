@@ -1,45 +1,26 @@
-// 对Date的扩展，将 Date 转化为指定格式的String 
-// 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符， 
-// 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) 
-// 例子： 
-// (new Date()).format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423 
-// (new Date()).format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
-Date.prototype.format = function (fmt) {
-  var o = {
-    "M+": this.getMonth() + 1,                 //月份 
-    "d+": this.getDate(),                    //日 
-    "h+": this.getHours(),                   //小时 
-    "m+": this.getMinutes(),                 //分 
-    "s+": this.getSeconds(),                 //秒 
-    "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
-    "S": this.getMilliseconds()             //毫秒 
-  };
-  if (/(y+)/.test(fmt))
-    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-  for (var k in o)
-    if (new RegExp("(" + k + ")").test(fmt))
-      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
-  return fmt;
-}
-
-const { Simplized, Traditionalized } = require('./ChineseTransformation');
-const { TimestampToTime } = require('./TimestampToTime');
-const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./ChalkConsole');
-const { Mongo, Redis, jsToDB, dbToJs } = require('./dbs');
+const regexMapper = require('./regex');
+const { Mongo, Redis } = require('./dbs');
+const { timestampToTime, dateFormat } = require('./date');
+const { getPrototypeType, isNotEmpty } = require('./type');
+const { simplized, traditionalized } = require('./string/ChineseTransformation');
+const { getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem } = require('./array');
+const { trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString } = require('./string');
+const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./log/ChalkConsole');
 
 module.exports = {
-  Simplized,
-  Traditionalized,
-  TimestampToTime,
-  Error,
-  ErrorConsole,
-  Success,
-  SuccessConsole,
-  Warning,
-  WarningConsole,
-  InsertConsole,
-  Mongo,
-  Redis,
-  jsToDB,
-  dbToJs,
+  // 日期相关
+  timestampToTime, dateFormat,
+  // 字符相关
+  simplized, traditionalized,
+  trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString,
+  // 数据库相关
+  Mongo, Redis,
+  // 输入相关
+  Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole,
+  // 正则相关
+  regexMapper,
+  // 类型相关
+  getPrototypeType, isNotEmpty,
+  // 数组相关
+  getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem,
 }
