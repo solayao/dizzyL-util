@@ -1,11 +1,11 @@
-const regexMapper = require('./regex');
-const { Mongo, Redis } = require('./dbs');
-const { timestampToTime, dateFormat } = require('./date');
-const { getPrototypeType, isNotEmpty } = require('./type');
-const { simplized, traditionalized } = require('./string/ChineseTransformation');
-const { getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem } = require('./array');
-const { trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString } = require('./string');
-const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./log/ChalkConsole');
+const regexMapper = require('./lib/regex');
+const { Mongo, Redis } = require('./lib/dbs');
+const { timestampToTime, dateFormat } = require('./lib/date');
+const { getPrototypeType, isNotEmpty } = require('./lib/type');
+const { simplized, traditionalized } = require('./lib/string/ChineseTransformation');
+const { getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem } = require('./lib/array');
+const { trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString } = require('./lib/string');
+const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./lib/log/ChalkConsole');
 
 module.exports = {
   // 日期相关
