@@ -1,5 +1,6 @@
 const regexMapper = require('./lib/regex');
 const { Mongo, Redis } = require('./lib/dbs');
+const { shallowClone, deepClone } = require('./lib/object');
 const { timestampToTime, dateFormat } = require('./lib/date');
 const { getPrototypeType, isNotEmpty } = require('./lib/type');
 const { simplized, traditionalized } = require('./lib/string/ChineseTransformation');
@@ -23,4 +24,6 @@ module.exports = {
   getPrototypeType, isNotEmpty,
   // 数组相关
   getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem,
+  // 对象相关
+  shallowClone, deepClone,
 }
