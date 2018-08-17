@@ -7,6 +7,7 @@ const { simplized, traditionalized } = require('./lib/string/ChineseTransformati
 const { getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem } = require('./lib/array');
 const { trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString } = require('./lib/string');
 const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./lib/log/ChalkConsole');
+const { flexiable, SystemMess } = require('./system');
 
 module.exports = {
   // 日期相关
@@ -26,4 +27,8 @@ module.exports = {
   getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem,
   // 对象相关
   shallowClone, deepClone,
+  // 样式
+  flexiable,
+  // 系统
+  SystemMess
 }
