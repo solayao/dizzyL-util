@@ -28,7 +28,7 @@ module.exports = {
   // 对象相关
   shallowClone, deepClone,
   // 样式
-  flexible,
-  // 系统
+  // flexible,
+  // 系统, 建议前端通过详细路径调用
   SystemMess
 }
