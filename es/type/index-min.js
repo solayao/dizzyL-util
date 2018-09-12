@@ -1,0 +1,1 @@
+"use strict";var getPrototypeType=function(t){return/^\[object ([a-zA-Z]+)\]$/.test(Object.prototype.toString.call(t))&&RegExp.$1},isNotEmpty=function(t){return!!t&&(!Array.isArray(t)||t.length>0)&&("Object"!==getPrototypeType(t)||Object.keys(t).length>0)};module.exports={getPrototypeType:getPrototypeType,isNotEmpty:isNotEmpty};

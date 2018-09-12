@@ -1,0 +1,1 @@
+"use strict";var Mongo=require("./MongoResource"),Redis=require("./RedisResource");module.exports={Mongo:Mongo,Redis:Redis};
