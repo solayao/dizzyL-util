@@ -1,9 +1,7 @@
-'use strict';
-
-var flexible = require('./flexible');
-var SystemMess = require('./systemMessEs5');
+const flexible = require('./flexible');
+const SystemMess = require('./systemMess');
 
 module.exports = {
-    flexible: flexible,
-    SystemMess: SystemMess
-};
+    flexible,
+    SystemMess
+}

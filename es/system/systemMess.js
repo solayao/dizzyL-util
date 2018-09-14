@@ -1,11 +1,5 @@
-"use strict";
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 // 呈现引擎
-var _engine = {
+let _engine = {
     ie: 0,
     gecko: 0,
     webkit: 0,
@@ -15,7 +9,7 @@ var _engine = {
     ver: null
 };
 // 浏览器
-var _browser = {
+let _browser = {
     ie: 0,
     firefox: 0,
     safari: 0,
@@ -26,7 +20,7 @@ var _browser = {
     ver: null
 };
 // 平台、设备和操作系统
-var _system = {
+let _system = {
     win: false,
     mac: false,
     x11: false,
@@ -40,26 +34,23 @@ var _system = {
     winMobile: false,
     //游戏系统
     wii: false,
-    ps: false
+    ps: false,
 };
 // 单例
-var _instance = void 0;
+let _instance;
 /**
  * 用户代理字符串检测脚本，包括检测呈现引擎、平台、Windows操作系统、移动设备
 和游戏系统, 单例模型
  * 
  * @class SystemMess
  */
-
-var SystemMess = function () {
-    function SystemMess() {
-        _classCallCheck(this, SystemMess);
-
+class SystemMess {
+    constructor() {
         if (!_instance) {
             _instance = this;
             if (navigator) {
                 //检测呈现引擎和浏览器
-                var ua = navigator.userAgent;
+                let ua = navigator.userAgent;
                 if (window.opera) {
                     _engine.ver = _browser.ver = window.opear.version();
                     _engine.opera = _browser.opera = parseFloat(_engine.ver);
@@ -76,7 +67,7 @@ var SystemMess = function () {
                         _browser.safari = parseFloat(_browser.ver);
                     } else {
                         //近似地确定版本号
-                        var safariVersion = 1;
+                        let safariVersion = 1;
                         if (_engine.webkit < 100) {
                             safariVersion = 1;
                         } else if (_engine.webkit < 312) {
@@ -112,7 +103,7 @@ var SystemMess = function () {
                 var p = navigator.platform;
                 _system.win = p.indexOf("Win") === 0;
                 _system.mac = p.indexOf("Mac") === 0;
-                _system.x11 = p === "X11" || p.indexOf("Linux") === 0;
+                _system.x11 = (p === "X11") || (p.indexOf("Linux") === 0);
 
                 //检测 Windows 操作系统
                 if (_system.win) {
@@ -183,39 +174,23 @@ var SystemMess = function () {
      * @readonly
      * @memberof SystemMess
      */
-
-
-    _createClass(SystemMess, [{
-        key: "getSystemMess",
-        get: function get() {
-            return {
-                engine: _engine,
-                browser: _browser,
-                system: _system
-            };
-        }
-        /**
-         * @description 判断是否是手机端
-         * @readonly
-         * @memberof SystemMess
-         */
-
-    }, {
-        key: "isPhone",
-        get: function get() {
-            var typeList = Object.keys(_system).filter(function (k) {
-                return Boolean(_system[k]);
-            });
-            return ['iphone', 'ipod', 'ipad', 'ios', 'android', 'nokiaN', 'winMobile'].some(function (v) {
-                return typeList.includes(v);
-            });
-        }
-    }]);
-
-    return SystemMess;
-}();
+    get getSystemMess() {
+        return ({
+            engine: _engine,
+            browser: _browser,
+            system: _system,
+        });
+    }
+    /**
+     * @description 判断是否是手机端
+     * @readonly
+     * @memberof SystemMess
+     */
+    get isPhone() {
+        const typeList = Object.keys(_system).filter(k => Boolean(_system[k]));
+        return ['iphone', 'ipod', 'ipad', 'ios', 'android', 'nokiaN', 'winMobile'].some(v => typeList.includes(v));
+    }
+}
 
 // export default SystemMess;
-
-
 module.exports = SystemMess;

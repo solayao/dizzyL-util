@@ -1,4 +1,3 @@
-'use strict';
 
 /**
  * @description 简体汇总
@@ -25,14 +24,14 @@ function FTPYStr() {
  * @returns {String}  繁体String
  */
 function traditionalized(cc) {
-    var str = '',
-        ss = JTPYStr(),
-        tt = FTPYStr();
+    var str = '', ss = JTPYStr(), tt = FTPYStr();
     for (var i = 0; i < cc.length; i++) {
-        if (cc.charCodeAt(i) > 10000 && ss.indexOf(cc.charAt(i)) != -1) str += tt.charAt(ss.indexOf(cc.charAt(i)));else str += cc.charAt(i);
+        if (cc.charCodeAt(i) > 10000 && ss.indexOf(cc.charAt(i)) != -1) str += tt.charAt(ss.indexOf(cc.charAt(i)));
+        else str += cc.charAt(i);
     }
     return str;
 }
+
 
 /**
  * @description 转换成简体
@@ -41,16 +40,15 @@ function traditionalized(cc) {
  * @returns {String} 简体String
  */
 function simplized(cc) {
-    var str = '',
-        ss = JTPYStr(),
-        tt = FTPYStr();
+    var str = '', ss = JTPYStr(), tt = FTPYStr();
     for (var i = 0; i < cc.length; i++) {
-        if (cc.charCodeAt(i) > 10000 && tt.indexOf(cc.charAt(i)) != -1) str += ss.charAt(tt.indexOf(cc.charAt(i)));else str += cc.charAt(i);
+        if (cc.charCodeAt(i) > 10000 && tt.indexOf(cc.charAt(i)) != -1) str += ss.charAt(tt.indexOf(cc.charAt(i)));
+        else str += cc.charAt(i);
     }
     return str;
-}
+} 
 
 module.exports = {
-    simplized: simplized,
-    traditionalized: traditionalized
+    simplized,
+    traditionalized,
 };

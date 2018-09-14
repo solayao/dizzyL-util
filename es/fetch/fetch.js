@@ -1,22 +1,15 @@
-'use strict';
-
-var _require = require('./config.json'),
-    baseUrl = _require.baseUrl,
-    basePort = _require.basePort,
-    basePath = _require.basePath;
+const { baseUrl, basePort, basePath }  = require('./config.json');
 
 /**
  * @function 检查返回值的状态
  * @param {any} response
  * @return {*} 
  */
-
-
 function _checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
         return response;
     } else {
-        var error = new Error(response.statusText);
+        let error = new Error(response.statusText);
         error.response = response;
         throw error;
     }
@@ -59,10 +52,11 @@ function _fetchWithCORS(packagedRequestURL, contentType, contentHeader) {
     return fetch(packagedRequestURL, {
         mode: 'cors',
         credentials: 'include',
-        headers: Object.assign({}, contentHeader)
-    }).then(_checkStatus).then(contentType === "json" ? _parseJSON : _parseText).catch(function (err) {
-        return console.log(err);
-    });
+        headers: Object.assign({}, contentHeader),
+    })
+        .then(_checkStatus)
+        .then(contentType === "json" ? _parseJSON : _parseText)
+        .catch(err => console.log(err));
 }
 
 /**
@@ -71,23 +65,9 @@ function _fetchWithCORS(packagedRequestURL, contentType, contentHeader) {
  * @param {any} { base_url = baseUrl, port = basePort, path = basePath, action = "GET", contentType = "json", contentHeader = {}, url } 
  * @returns  {Promise.<TResult>|*} Promise.then((data)=>{},(error)=>{});
  */
-function _get(_ref) {
-    var _ref$base_url = _ref.base_url,
-        base_url = _ref$base_url === undefined ? baseUrl : _ref$base_url,
-        _ref$port = _ref.port,
-        port = _ref$port === undefined ? basePort : _ref$port,
-        _ref$path = _ref.path,
-        path = _ref$path === undefined ? basePath : _ref$path,
-        _ref$action = _ref.action,
-        action = _ref$action === undefined ? "GET" : _ref$action,
-        _ref$contentType = _ref.contentType,
-        contentType = _ref$contentType === undefined ? "json" : _ref$contentType,
-        _ref$contentHeader = _ref.contentHeader,
-        contentHeader = _ref$contentHeader === undefined ? {} : _ref$contentHeader,
-        url = _ref.url;
-
-    var Url = url ? url : base_url + ':' + port;
-    var packagedRequestURL = '' + Url + path + '?action=' + action;
+function _get({ base_url = baseUrl, port = basePort, path = basePath, action = "GET", contentType = "json", contentHeader = {}, url }) {
+    const Url = url ? url : base_url+':'+port;    
+    const packagedRequestURL = `${Url}${path}?action=${action}`;
     return _fetchWithCORS(packagedRequestURL, contentType, contentHeader);
 }
 
@@ -97,33 +77,17 @@ function _get(_ref) {
  * @param {any} { base_url = baseUrl, port = basePort, path = basePath, requestParams = {}, action = "GET", contentType = "json", contentHeader = {}, url} 
  * @returns  {Promise.<TResult>|*} Promise.then((data)=>{},(error)=>{})
  */
-function _getWithQueryParams(_ref2) {
-    var _ref2$base_url = _ref2.base_url,
-        base_url = _ref2$base_url === undefined ? baseUrl : _ref2$base_url,
-        _ref2$port = _ref2.port,
-        port = _ref2$port === undefined ? basePort : _ref2$port,
-        _ref2$path = _ref2.path,
-        path = _ref2$path === undefined ? basePath : _ref2$path,
-        _ref2$requestParams = _ref2.requestParams,
-        requestParams = _ref2$requestParams === undefined ? {} : _ref2$requestParams,
-        _ref2$action = _ref2.action,
-        action = _ref2$action === undefined ? "GET" : _ref2$action,
-        _ref2$contentType = _ref2.contentType,
-        contentType = _ref2$contentType === undefined ? "json" : _ref2$contentType,
-        _ref2$contentHeader = _ref2.contentHeader,
-        contentHeader = _ref2$contentHeader === undefined ? {} : _ref2$contentHeader,
-        url = _ref2.url;
-
+function _getWithQueryParams({ base_url = baseUrl, port = basePort, path = basePath, requestParams = {}, action = "GET", contentType = "json", contentHeader = {}, url}) {
     // 根据queryParams构造查询字符串    
-    var queryString = "";
-    for (var key in requestParams) {
-        queryString += key + '=' + encodeURIComponent(requestParams[key]) + '&';
+    let queryString = "";
+    for (let key in requestParams) {
+        queryString += `${key}=${encodeURIComponent(requestParams[key])}&`
     }
-    var Url = url ? url : base_url + ':' + port;
+    const Url = url ? url : base_url+':'+port;
     // 将查询字符串进行编码
-    var encodedQueryString = queryString;
+    let encodedQueryString = (queryString);
 
-    var packagedRequestURL = '' + Url + path + '?' + encodedQueryString + 'action=' + action;
+    const packagedRequestURL = `${Url}${path}?${encodedQueryString}action=${action}`;
     return _fetchWithCORS(packagedRequestURL, contentType, contentHeader);
 }
 
@@ -133,28 +97,12 @@ function _getWithQueryParams(_ref2) {
  * @param {any} { base_url = baseUrl, port = basePort, path = basePath, requestParams = {}, action = "GET", contentType = "json", contentHeader = {}, url } 
  * @returns {Promise.<TResult>|*} Promise.then((data)=>{},(error)=>{})
  */
-function _getWithRequestData(_ref3) {
-    var _ref3$base_url = _ref3.base_url,
-        base_url = _ref3$base_url === undefined ? baseUrl : _ref3$base_url,
-        _ref3$port = _ref3.port,
-        port = _ref3$port === undefined ? basePort : _ref3$port,
-        _ref3$path = _ref3.path,
-        path = _ref3$path === undefined ? basePath : _ref3$path,
-        _ref3$requestParams = _ref3.requestParams,
-        requestParams = _ref3$requestParams === undefined ? {} : _ref3$requestParams,
-        _ref3$action = _ref3.action,
-        action = _ref3$action === undefined ? "GET" : _ref3$action,
-        _ref3$contentType = _ref3.contentType,
-        contentType = _ref3$contentType === undefined ? "json" : _ref3$contentType,
-        _ref3$contentHeader = _ref3.contentHeader,
-        contentHeader = _ref3$contentHeader === undefined ? {} : _ref3$contentHeader,
-        url = _ref3.url;
-
+function _getWithRequestData({ base_url = baseUrl, port = basePort, path = basePath, requestParams = {}, action = "GET", contentType = "json", contentHeader = {}, url }) {
     //将requestData序列化为JSON
     //注意要对序列化后的数据进行URI编码
-    var requestDataString = encodeURIComponent(JSON.stringify(requestParams));
-    var Url = url ? url : base_url + ':' + port;
-    var packagedRequestURL = '' + Url + path + '?requestData=' + requestDataString + '&action=' + action;
+    let requestDataString = encodeURIComponent(JSON.stringify(requestParams));
+    const Url = url ? url : base_url+':'+port;
+    const packagedRequestURL = `${Url}${path}?requestData=${requestDataString}&action=${action}`;
     return _fetchWithCORS(packagedRequestURL, contentType, contentHeader);
 }
 
@@ -164,28 +112,12 @@ function _getWithRequestData(_ref3) {
  * @param {any} { base_url = baseUrl, port = basePort, path = basePath, requestParams = {}, action = "POST", contentType = "json", contentHeader = {}, url } 
  * @returns  {Promise.<TResult>|*} Promise.then((data)=>{},(error)=>{})
  */
-function _postWithRequestData(_ref4) {
-    var _ref4$base_url = _ref4.base_url,
-        base_url = _ref4$base_url === undefined ? baseUrl : _ref4$base_url,
-        _ref4$port = _ref4.port,
-        port = _ref4$port === undefined ? basePort : _ref4$port,
-        _ref4$path = _ref4.path,
-        path = _ref4$path === undefined ? basePath : _ref4$path,
-        _ref4$requestParams = _ref4.requestParams,
-        requestParams = _ref4$requestParams === undefined ? {} : _ref4$requestParams,
-        _ref4$action = _ref4.action,
-        action = _ref4$action === undefined ? "POST" : _ref4$action,
-        _ref4$contentType = _ref4.contentType,
-        contentType = _ref4$contentType === undefined ? "json" : _ref4$contentType,
-        _ref4$contentHeader = _ref4.contentHeader,
-        contentHeader = _ref4$contentHeader === undefined ? {} : _ref4$contentHeader,
-        url = _ref4.url;
-
+function _postWithRequestData({ base_url = baseUrl, port = basePort, path = basePath, requestParams = {}, action = "POST", contentType = "json", contentHeader = {}, url }) {
     //将requestData序列化为JSON
     //注意要对序列化后的数据进行URI编码
-    var requestDataString = encodeURIComponent(JSON.stringify(requestParams));
-    var Url = url ? url : base_url + ':' + port;
-    var packagedRequestURL = '' + Url + path + '?requestData=' + requestDataString + '&action=' + action;
+    let requestDataString = encodeURIComponent(JSON.stringify(requestParams));
+    const Url = url ? url : base_url+':'+port;
+    const packagedRequestURL = `${Url}${path}?requestData=${requestDataString}&action=${action}`;
     return _fetchWithCORS(packagedRequestURL, contentType, contentHeader);
 }
 
@@ -195,32 +127,15 @@ function _postWithRequestData(_ref4) {
  * @argument {any} { fetchType = [get, getByQuery, getByRequest, post] }
  * @returns {Promise.<TResult>|*} Promise.then((data)=>{},(error)=>{})
  */
-module.exports = function (_ref5) {
-    var _ref5$base_url = _ref5.base_url,
-        base_url = _ref5$base_url === undefined ? baseUrl : _ref5$base_url,
-        _ref5$port = _ref5.port,
-        port = _ref5$port === undefined ? basePort : _ref5$port,
-        _ref5$path = _ref5.path,
-        path = _ref5$path === undefined ? basePath : _ref5$path,
-        _ref5$timeout = _ref5.timeout,
-        timeout = _ref5$timeout === undefined ? 120000 : _ref5$timeout,
-        _ref5$fetchType = _ref5.fetchType,
-        fetchType = _ref5$fetchType === undefined ? "get" : _ref5$fetchType,
-        _ref5$requestParams = _ref5.requestParams,
-        requestParams = _ref5$requestParams === undefined ? {} : _ref5$requestParams,
-        _ref5$contentType = _ref5.contentType,
-        contentType = _ref5$contentType === undefined ? "json" : _ref5$contentType,
-        url = _ref5.url;
-
-    var timeoutId = void 0,
-        _fetch = void 0;
-    var _arguments = {
-        base_url: base_url,
-        port: port,
-        url: url,
-        path: path,
-        requestParams: requestParams,
-        contentType: contentType
+module.exports = ({base_url = baseUrl, port = basePort, path = basePath, timeout = 120000, fetchType = "get", requestParams = {}, contentType = "json", url}) => {
+    let timeoutId, _fetch;
+    const _arguments = {
+        base_url,
+        port,
+        url,
+        path,
+        requestParams,
+        contentType,
     };
     switch (fetchType) {
         case 'get':
@@ -236,18 +151,21 @@ module.exports = function (_ref5) {
             _fetch = _postWithRequestData(_arguments);
             break;
         default:
-            _fetch = fetch(base_url + ':' + port + path, {});
+            _fetch = fetch(`${base_url}:${port}${path}`, {});
     }
-    return Promise.race([new Promise(function (resolve, reject) {
-        timeoutId = setTimeout(function () {
-            reject('Fetch timeout.');
-        }, timeout);
-    }), _fetch]
-    // fetch(`${base_url}${path}`, options),
-    ).then(function (response) {
+    return Promise.race([
+        new Promise((resolve, reject) => {
+            timeoutId = setTimeout(() => {
+                reject('Fetch timeout.');
+            }, timeout)
+        }),
+        _fetch,
+        // fetch(`${base_url}${path}`, options),
+    ]).then(response => {
         clearTimeout(timeoutId);
         return response;
-    }).catch(function (err) {
-        return console.log(err);
-    });
-};
+    }).catch(err => console.log(err));
+}
+
+
+

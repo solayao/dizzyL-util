@@ -1,1 +1,0 @@
-"use strict";var flexible=require("./flexible"),SystemMess=require("./systemMessEs5");module.exports={flexible:flexible,SystemMess:SystemMess};

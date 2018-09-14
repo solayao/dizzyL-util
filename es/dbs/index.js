@@ -1,9 +1,7 @@
-'use strict';
-
-var Mongo = require('./MongoResource');
-var Redis = require('./RedisResource');
+const Mongo = require('./MongoResource');
+const Redis = require('./RedisResource');
 
 module.exports = {
-    Mongo: Mongo,
-    Redis: Redis
+    Mongo,
+    Redis,
 };
