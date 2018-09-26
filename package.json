@@ -19,11 +19,14 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "chalk": "^2.4.1",
+    "crawler": "^1.2.0",
     "fbjs": "^0.8.17",
     "generic-pool": "^3.4.2",
+    "headless-chrome-crawler": "^1.8.0",
     "log4js": "^3.0.4",
     "mongodb": "^3.1.1",
-    "redis": "^2.8.0"
+    "redis": "^2.8.0",
+    "seenreq": "^2.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

@@ -8,6 +8,7 @@ const { getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem } = requi
 const { trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString } = require('./string');
 const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./log/ChalkConsole');
 const { flexible, SystemMess } = require('./system');
+const { C, HC } = require('./crawler');
 
 module.exports = {
   // 日期相关
@@ -29,6 +30,8 @@ module.exports = {
   shallowClone, deepClone,
   // 样式
   // flexible,
-  // 系统, 建议前端通过详细路径调用
-  SystemMess
+  // 系统
+  SystemMess,
+  // 爬虫相关
+  C, HC
 }
