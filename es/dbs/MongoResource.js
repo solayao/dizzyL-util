@@ -95,7 +95,7 @@ class MongoResource {
     actionQuery(collection = '', doc = null) {
         if (!doc || collection === '') return;
         return this.mongoPool.sqlAction(client => {
-            return new Promise(async (resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 try{
                     client.db(dbName).collection(collection).find(doc).toArray((err, msg) => {
                         // console.log(msg);
@@ -121,7 +121,7 @@ class MongoResource {
     actionAggregate(collection = '', doc = null) {
         if (!doc || collection === '') return;
         return this.mongoPool.sqlAction(client => {
-            return new Promise(async (resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 try{
                     client.db(dbName).collection(collection).aggregate(doc).toArray((err, msg) => {
                         // console.log(msg);
@@ -149,7 +149,7 @@ class MongoResource {
     actionUpdate(collection = '', filter = null, doc = null, upsert = false, multi = false) {
         if (!doc || !filter || !doc) return;
         return this.mongoPool.sqlAction(client => {
-            return new Promise(async (resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 client.db(dbName).collection(collection).update(filter, doc, { upsert, multi })
                 .then(msg => {
                     // console.log(msg)
@@ -177,8 +177,6 @@ class MongoResource {
 }
 
 module.exports = MongoResource;
-
-
 // mongo 删除重复项
 // db.comic.aggregate([
 //     {

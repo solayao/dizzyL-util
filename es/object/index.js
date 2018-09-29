@@ -44,8 +44,8 @@ const allKeyRename = (source, mapper, includeOther = true) => getPrototypeType(s
             if (mapper.hasOwnProperty(current)) {
               let key = mapper[current];
               total[key] = source[current];
-            } else {
-               includeOther && total[current] = source[current];
+            } else if (includeOther) {
+               total[current] = source[current];
             }
             return total;
     }, {}) : source;
