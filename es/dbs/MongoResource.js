@@ -108,7 +108,33 @@ class MongoResource {
             });
         });
     }
-
+    
+    /**
+     * @description Mongo数据库aggregate操作
+     * @url https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
+     * @author Dizzy L
+     * @param {string} [collection=''] mongo的集合名
+     * @param {Array} [doc=[ { <stage> }, ... ]] 聚合操作符指定条件
+     * @memberof MongoResource
+     * @returns {Array} 查询到的结果数组
+     */
+    actionAggregate(collection = '', doc = null) {
+        if (!doc || collection === '') return;
+        return this.mongoPool.sqlAction(client => {
+            return new Promise(async (resolve, reject) => {
+                try{
+                    client.db(dbName).collection(collection).aggregate(doc).toArray((err, msg) => {
+                        // console.log(msg);
+                        resolve(msg);
+                    })
+                } catch (err) {
+                    console.log(err)
+                }
+          
+            });
+        });
+    }
+    
     /**
      * @description Mongo数据库update操作
      * @author Dizzy L
