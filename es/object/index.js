@@ -31,7 +31,27 @@ const deepClone = (source) => {
     return copy;
 }
 
+/**
+ * @description 对象key的重命名
+ * @author Dizzy L
+ * @param {Object} source 对象
+ * @param {Object} mapper 对应表
+ * @param {Boolean} includeOther 是否包含不在对应表内的key&value
+ * @returns {*} 重命名后的对象/source本身
+ */
+const allKeyRename = (source, mapper, includeOther = true) => getPrototypeType(source) === 'Object' && getPrototypeType(mapper) === 'Object' ?
+    Object.keys(source).reduce((total, current)=>{
+            if (mapper.hasOwnProperty(current)) {
+              let key = mapper[current];
+              total[key] = source[current];
+            } else {
+               includeOther && total[current] = source[current];
+            }
+            return total;
+    }, {}) : source;
+
 module.exports = {
     shallowClone,
-    deepClone
+    deepClone,
+    allKeyRename
 }
