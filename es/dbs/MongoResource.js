@@ -162,6 +162,24 @@ class MongoResource {
         })
     }
 
+    /**
+     * 获取mongo实例自行编写方法
+     * @param {Promise} [promiseFunc=(client) =>　{}] client实例将要执行的方法
+     * @returns 
+     * @memberof MongoResource
+     */
+    actionForClient(promiseFunc = (client) =>　{})　{
+        return this.mongoPool.sqlAction(client => {
+            return promiseFunc(client);
+        })
+    }
+
+    /**
+     * 以n查询comic下的非重复集合
+     *
+     * @returns
+     * @memberof MongoResource
+     */
     distinct() {
         return this.mongoPool.sqlAction(client => {
             return new Promise((resolve, reject) => {
