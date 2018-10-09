@@ -1,8 +1,8 @@
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 const DBpool = require('./DBpool');
-const { mongoConfig } = require('./config.json');
-const { SuccessConsole, ErrorConsole, InsertConsole } = require('../log/ChalkConsole');
+const {mongoConfig} = require('./config.json');
+const {SuccessConsole, ErrorConsole, InsertConsole} = require('../log/ChalkConsole');
 
 const dbName = mongoConfig.db;
 
@@ -16,8 +16,8 @@ class MongoResource {
     /**
      * Creates an instance of MongoResource.
      * @author Dizzy L
-     * @param {any} [options=mongoConfig] 
-     * @param {any} [poolOptions={}] 
+     * @param {any} [options=mongoConfig]
+     * @param {any} [poolOptions={}]
      * @memberof MongoResource
      */
     constructor(options = mongoConfig, poolOptions = {}) {
@@ -32,22 +32,38 @@ class MongoResource {
         }
 
         const connectFunc = () => {
-            return MongoClient.connect(mongoUrl, { useNewUrlParser: true })
-            .then(client => {
-                SuccessConsole('DBpool message', __filename,`Connected MongoDB (${mongoUrl}) successfully to server.`)
-                return client;
-            })
-            .catch(err => {
-                ErrorConsole('DBpool message', __filename, `Connected MongoDB (${mongoUrl}) NOT successfully to server!\n\t${err}`)
-            });
+            return MongoClient
+                .connect(mongoUrl, {useNewUrlParser: true})
+                .then(client => {
+                    SuccessConsole(
+                        'DBpool message',
+                        __filename,
+                        `Connected MongoDB (${mongoUrl}) successfully to server.`
+                    )
+                    return client;
+                })
+                .catch(err => {
+                    ErrorConsole(
+                        'DBpool message',
+                        __filename,
+                        `Connected MongoDB (${mongoUrl}) NOT successfully to server!\n\t${err}`
+                    )
+                });
         };
         const disconnectFunc = (client) => {
             client.close();
-            SuccessConsole('DBpool message', __filename,`Closed MongoDB (${mongoUrl}) successfully to server.`)
+            SuccessConsole(
+                'DBpool message',
+                __filename,
+                `Closed MongoDB (${mongoUrl}) successfully to server.`
+            )
         };
-        
-        this.mongoPool = Object.keys(poolOptions).length > 0 ? new DBpool(connectFunc, disconnectFunc, poolOptions) 
-            : new DBpool(connectFunc, disconnectFunc);
+
+        this.mongoPool = Object
+            .keys(poolOptions)
+            .length > 0
+                ? new DBpool(connectFunc, disconnectFunc, poolOptions)
+                : new DBpool(connectFunc, disconnectFunc);
     }
 
     /**
@@ -56,9 +72,23 @@ class MongoResource {
      * @memberof MongoResource
      */
     close() {
-        this.mongoPool.closePool();
+        this
+            .mongoPool
+            .closePool();
     }
-    
+
+    /**
+     *  Mongo对执行pool执行sqlAction的再封装
+     * @param {*} actionFunc
+     * @returns
+     * @memberof MongoResource
+     */
+    action(actionFunc) {
+        return this
+            .mongoPool
+            .sqlAction(actionFunc, __filename);
+    }
+
     /**
      * @description Mongo数据库Insert操作
      * @author Dizzy L
@@ -68,19 +98,32 @@ class MongoResource {
      * @returns {Array} 插入到MongoDB的ids数组
      */
     actionInsert(collection = '', doc = null) {
-        if (!doc || collection === '') return;
-        if (Array.isArray(doc) && doc.length === 0) return [];
-        return this.mongoPool.sqlAction(client => {
+        if (!doc || collection === '') 
+            return;
+        if (Array.isArray(doc) && doc.length === 0) 
+            return [];
+        return this.action(client => {
             return new Promise((resolve, reject) => {
-                client.db(dbName).collection(collection).insert(doc)
-                .then(msg => {
-                    if(msg.result.hasOwnProperty('ok')) {
-                        SuccessConsole('DBpool message', __filename,`Insert (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`);
-                        InsertConsole('DBpool message', __filename,`Insert (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`);
-                        resolve(Object.values(msg.insertedIds));
-                    }
-                })
-                .catch(err => reject(err));
+                client
+                    .db(dbName)
+                    .collection(collection)
+                    .insert(doc)
+                    .then(msg => {
+                        if (msg.result.hasOwnProperty('ok')) {
+                            SuccessConsole(
+                                'DBpool message',
+                                __filename,
+                                `Insert (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`
+                            );
+                            InsertConsole(
+                                'DBpool message',
+                                __filename,
+                                `Insert (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`
+                            );
+                            resolve(Object.values(msg.insertedIds));
+                        }
+                    })
+                    .catch(err => reject(err));
             });
         });
     }
@@ -93,22 +136,27 @@ class MongoResource {
      * @returns {Array} 查询到的结果数组
      */
     actionQuery(collection = '', doc = null) {
-        if (!doc || collection === '') return;
-        return this.mongoPool.sqlAction(client => {
+        if (!doc || collection === '') 
+            return;
+        return this.action(client => {
             return new Promise((resolve, reject) => {
-                try{
-                    client.db(dbName).collection(collection).find(doc).toArray((err, msg) => {
-                        // console.log(msg);
-                        resolve(msg);
-                    })
+                try {
+                    client
+                        .db(dbName)
+                        .collection(collection)
+                        .find(doc)
+                        .toArray((err, msg) => {
+                            // console.log(msg);
+                            resolve(msg);
+                        })
                 } catch (err) {
                     console.log(err)
                 }
-          
+
             });
         });
     }
-    
+
     /**
      * @description Mongo数据库aggregate操作
      * @url https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
@@ -119,22 +167,27 @@ class MongoResource {
      * @returns {Array} 查询到的结果数组
      */
     actionAggregate(collection = '', doc = null) {
-        if (!doc || collection === '') return;
-        return this.mongoPool.sqlAction(client => {
+        if (!doc || collection === '') 
+            return;
+        return this.action(client => {
             return new Promise((resolve, reject) => {
-                try{
-                    client.db(dbName).collection(collection).aggregate(doc).toArray((err, msg) => {
-                        // console.log(msg);
-                        resolve(msg);
-                    })
+                try {
+                    client
+                        .db(dbName)
+                        .collection(collection)
+                        .aggregate(doc)
+                        .toArray((err, msg) => {
+                            // console.log(msg);
+                            resolve(msg);
+                        })
                 } catch (err) {
                     console.log(err)
                 }
-          
+
             });
         });
     }
-    
+
     /**
      * @description Mongo数据库update操作
      * @author Dizzy L
@@ -143,33 +196,51 @@ class MongoResource {
      * @param {*} [doc=null] 设置的值
      * @param {boolean} [upsert=false] 不存在数据时是否插入数据
      * @param {boolean} [multi=false] 只更新查询到第一条
-     * @returns 
+     * @returns
      * @memberof MongoResource
      */
-    actionUpdate(collection = '', filter = null, doc = null, upsert = false, multi = false) {
-        if (!doc || !filter || !doc) return;
-        return this.mongoPool.sqlAction(client => {
+    actionUpdate(
+        collection = '',
+        filter = null,
+        doc = null,
+        upsert = false,
+        multi = false
+    ) {
+        if (!doc || !filter || !doc) 
+            return;
+        return this.action(client => {
             return new Promise((resolve, reject) => {
-                client.db(dbName).collection(collection).update(filter, doc, { upsert, multi })
-                .then(msg => {
-                    // console.log(msg)
-                    SuccessConsole('DBpool message', __filename, `Update (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`);
-                    InsertConsole('DBpool message', __filename, `Update (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`);
-                    resolve();
-                })
-                .catch(err => reject(err))
-            });
+                client
+                    .db(dbName)
+                    .collection(collection)
+                    .update(filter, doc, {upsert, multi})
+                    .then(msg => {
+                        // console.log(msg)
+                        SuccessConsole(
+                            'DBpool message',
+                            __filename,
+                            `Update (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`
+                        );
+                        InsertConsole(
+                            'DBpool message',
+                            __filename,
+                            `Update (\n${JSON.stringify(doc)}\n) to (${collection}) successfully.`
+                        );
+                        resolve();
+                    })
+                    .catch(err => reject(err))
+                });
         })
     }
 
     /**
      * 获取mongo实例自行编写方法
      * @param {Promise} [promiseFunc=(client) =>　{}] client实例将要执行的方法
-     * @returns 
+     * @returns
      * @memberof MongoResource
      */
-    actionForClient(promiseFunc = (client) =>　{})　{
-        return this.mongoPool.sqlAction(client => {
+    actionForClient(promiseFunc = (client) => {}) {
+        return this.action(client => {
             return promiseFunc(client);
         })
     }
@@ -181,13 +252,16 @@ class MongoResource {
      * @memberof MongoResource
      */
     distinct() {
-        return this.mongoPool.sqlAction(client => {
+        return this.action(client => {
             return new Promise((resolve, reject) => {
-                client.db(dbName).collection('comic').distinct('n')
-                .then(msg => {
-                    resolve(msg);
-                })
-                .catch(err => reject(err));
+                client
+                    .db(dbName)
+                    .collection('comic')
+                    .distinct('n')
+                    .then(msg => {
+                        resolve(msg);
+                    })
+                    .catch(err => reject(err));
             });
         })
     }
@@ -195,29 +269,12 @@ class MongoResource {
 }
 
 module.exports = MongoResource;
-// mongo 删除重复项
-// db.comic.aggregate([
-//     {
-//         $group: { _id: {name: '$n'},count: {$sum: 1},dups: {$addToSet: '$_id'}}
-//     },
-//     {
-//         $match: {count: {$gt: 1}}
-//     }
-//   ]).forEach(function(doc){
-//     doc.dups.shift();
-//     doc.dups.forEach(function(d){
-//       db.chapter.remove({_id: {$in: d.dM}});
-//       db.chapter.remove({_id: {$in: d.dO}});
-//     });
-//     db.comic.remove({_id: {$in: doc.dups}});
-//   })
-  
-  
-//   db.chpater.aggregate([
-//     {
-//         $group: { _id: {name: '$link'},count: {$sum: 1},dups: {$addToSet: '$_id'}}
-//     },
-//     {
-//         $match: {count: {$gt: 1}}
-//     }
-//   ])
+// mongo 删除重复项 db.comic.aggregate([     {         $group: { _id: {name:
+// '$n'},count: {$sum: 1},dups: {$addToSet: '$_id'}}     },     {
+// $match: {count: {$gt: 1}}     }   ]).forEach(function(doc){
+// doc.dups.shift();     doc.dups.forEach(function(d){
+// db.chapter.remove({_id: {$in: d.dM}});       db.chapter.remove({_id: {$in:
+// d.dO}});     });     db.comic.remove({_id: {$in: doc.dups}});   })
+// db.chpater.aggregate([     {         $group: { _id: {name: '$link'},count:
+// {$sum: 1},dups: {$addToSet: '$_id'}}     },     {         $match: {count:
+// {$gt: 1}}     }   ])
