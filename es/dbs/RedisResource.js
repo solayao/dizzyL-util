@@ -84,6 +84,40 @@ class RedisResource {
             .redisPool
             .sqlAction(actionFunc, __filename);
     }
+    
+    /**
+     * @description Redis的lpush操作
+     * @author Dizzy L
+     * @param {string} key 要插入的数组Key
+     * @param {array} arr 带插入的数组
+     * @param {Number} expire 过期时间(s)
+     * @memberof RedisResource
+     */
+    lPush(key = "", arr = [], expire = -1) {
+        this.action(client => {
+            return client
+                        .LPUSHAsync(key, ...arr)
+                        .then(data => {
+                            if (expire !== -1) 
+                                client.EXPIREAsync(key, expire);
+                            return data;
+                        });
+        })
+    }
+    
+    /**
+     * @description Redis的lrange操作
+     * @author Dizzy L
+     * @param {string} key 需要查询的关键 key
+     * @param {array} length 要查询的开始和结束index数组, 默认[0, -1]查询key的结果的所有长度
+     * @memberof RedisResource
+     */
+    lRange(key = "", length = [0, -1]) {
+        this.action(client => {
+            return client
+                        .LRANGEAsync(key, ...length);
+        })
+    }
 
     /**
      * @description Redis的哈希设置
@@ -158,6 +192,18 @@ class RedisResource {
         return this.action(client => {
             return client.FLUSHALLAsync();
         });
+    }
+
+    /**
+     * 获取mongo实例自行编写方法
+     * @param {Promise} [promiseFunc=(client) =>　{}] client实例将要执行的方法
+     * @returns
+     * @memberof RedisResource
+     */
+    actionForClient(promiseFunc = (client) => {}) {
+        return this.action(client => {
+            return promiseFunc(client);
+        })
     }
 }
 
