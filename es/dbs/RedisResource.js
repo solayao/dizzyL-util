@@ -16,6 +16,13 @@ class RedisResource {
     constructor(options = redisConfig, poolOptions = {}) {
         const defaultOpt = {
             retry_strategy: function (options) {
+                if (options.error && options.error.code === 'ETIMEDOUT') {
+                    ErrorConsole(
+                        'DBpool message',
+                        __filename,
+                        `Connected MongoDB (${options.error.address}:${options.error.port}) NOT successfully to server!`
+                    );
+                }
                 if (options.error && options.error.code === 'ECONNREFUSED') {
                     // End reconnecting on a specific error and flush all commands with a individual
                     // error
@@ -30,6 +37,7 @@ class RedisResource {
                 }
                 if (options.attempt > 10) {
                     // End reconnecting with built in error
+                    ErrorConsole('DBpool Message', __filename, 'End reconnecting!');
                     return undefined;
                 }
                 // reconnect after
@@ -38,11 +46,13 @@ class RedisResource {
         };
         const connectFunc = () => {
             const redis = Redis.createClient(Object.assign({}, options, defaultOpt));
-            SuccessConsole(
-                'DBpool Message',
-                __filename,
-                `Connected Reids (${redisConfig.host}:${redisConfig.port}) successfully to server.`
-            );
+            redis.on("connect", function () {
+                SuccessConsole(
+                    'DBpool Message',
+                    __filename,
+                    `Connected Reids (${options.host}:${options.port}) successfully to server.`
+                );
+            });
             return redis;
         };
         const disconnectFunc = async (client) => {
@@ -51,7 +61,7 @@ class RedisResource {
             SuccessConsole(
                 'DBpool Message',
                 __filename,
-                `Closed Reids (${redisConfig.host}:${redisConfig.port}) successfully to server.`
+                `Closed Reids (${options.host}:${options.port}) successfully to server.`
             );
         };
 
