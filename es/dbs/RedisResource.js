@@ -84,7 +84,7 @@ class RedisResource {
             .redisPool
             .sqlAction(actionFunc, __filename);
     }
-    
+
     /**
      * @description Redis的lpush操作
      * @author Dizzy L
@@ -94,17 +94,17 @@ class RedisResource {
      * @memberof RedisResource
      */
     lPush(key = "", arr = [], expire = -1) {
-        this.action(client => {
+        return this.action(client => {
             return client
-                        .LPUSHAsync(key, ...arr)
-                        .then(data => {
-                            if (expire !== -1) 
-                                client.EXPIREAsync(key, expire);
-                            return data;
-                        });
+                .LPUSHAsync(key, ...arr)
+                .then(data => {
+                    if (expire !== -1) 
+                        client.EXPIREAsync(key, expire);
+                    return data;
+                });
         })
     }
-    
+
     /**
      * @description Redis的lrange操作
      * @author Dizzy L
@@ -113,9 +113,9 @@ class RedisResource {
      * @memberof RedisResource
      */
     lRange(key = "", length = [0, -1]) {
-        this.action(client => {
-            return client
-                        .LRANGEAsync(key, ...length);
+        return this.action(client => {
+            console.log(key, ...length)
+            return client.LRANGEAsync(key, ...length);
         })
     }
 
@@ -128,7 +128,7 @@ class RedisResource {
      * @memberof RedisResource
      */
     hmSet(key = "", paramsObj, expire = -1) {
-        this.action(client => {
+        return this.action(client => {
             return new Promise((resolve, reject) => {
                 if (key) 
                     client
@@ -209,13 +209,15 @@ class RedisResource {
 
 module.exports = RedisResource;
 
-// (async() => { const r = new RedisResource(); await r.hmSet('test', {param1:
-// 'test1', param2: 'test2'}); const r2 = new RedisResource(); await
-// r2.hmSet('test3', {param1: 'test1', param2: 'test2'}); await r.hmSet('test2',
-// {param1: 'test1', param2: 'test2'}); await r.close(); await r2.hmSet('test4',
-// {param1: 'test1', param2: 'test2'}); await r.hmSet('2015-1', {param1:
-// 'test1', param2: 'test2'}); await r.hmSet('2016-1', {param1: 'test1', param2:
-// 'test2'}); await r.hmSet('2016-4', {param1: 'test1', param2: 'test2'},
-// 10000); await r.hmSet('2016-5', {param1: 'test1', param2: 'test2'}); await
+// (async () => {     const r = new RedisResource(); await r.hmSet('test', {
+// param1: 'test1',     param2: 'test2' }); const r2 = new RedisResource();
+// await r2.hmSet('test3', {     param1: 'test1',     param2: 'test2' }); await
+// r.hmSet('test2', {     param1: 'test1',     param2: 'test2' }); await
+// r.close(); await r2.hmSet('test4', {     param1: 'test1',     param2: 'test2'
+// }); await r.hmSet('2015-1', {     param1: 'test1',     param2: 'test2' });
+// await r.hmSet('2016-1', {     param1: 'test1',     param2: 'test2' }); await
+// r.hmSet('2016-4', {     param1: 'test1',     param2: 'test2' }, 10000); await
+// r.hmSet('2016-5', {     param1: 'test1',     param2: 'test2' }); await
 // r.flushall(); console.log(await r.keys()); let fir = await
-// r.hgetAll(test[0]); await r.close(); })();
+// r.hgetAll(test[0]); console.log(await r.lRange('banzhuan_OneDay')) await
+// r.close(); })();
