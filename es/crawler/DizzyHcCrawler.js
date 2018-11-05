@@ -58,13 +58,11 @@ class DizzyHcCrawler {
             console.log(err)
             ErrorConsole('Crawler Catch Error', __filename, `[HC FAILED] \n\t${JSON.stringify(err)}`);
         });
-        this.crawler.on('maxdepthreached', (options) => {
-            ErrorConsole('Crawler Catch Error', __filename, `[HC FAILED] maxdepthreached \n\t${options.url}`);
-            this.close();
+        this.crawler.on('maxdepthreached', () => {
+            WarningConsole('Crawler Catch Error', __filename, '[HC FAILED] maxdepthreached');
         });
         this.crawler.on('maxrequestreached', () => {
             ErrorConsole('Crawler Catch Error', __filename, '[HC FAILED] maxrequestreached');
-            this.close();
         });
         this.crawler.on('disconnected', () => {
             SuccessConsole('Crawler Catch HTML', __filename, '[HC DISCONNECTED] successful');
