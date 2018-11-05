@@ -1,10 +1,11 @@
 const MongoDB = require('mongodb');
 const MongoClient = MongoDB.MongoClient;
 const DBpool = require('./DBpool');
-const {mongoConfig} = require('./config.json');
+const {mongoConfig, dbs} = require('./config.json');
 const {SuccessConsole, ErrorConsole, InsertConsole} = require('../log/ChalkConsole');
+const {isNotEmpty} = require('../type');
 
-const dbName = mongoConfig.db;
+const dbName = dbs[0];
 
 /**
  * @description Mongo连接池
@@ -25,12 +26,14 @@ class MongoResource {
 
         if (!mongoUrl) {
             if (options.user && options.pass) {
-                mongoUrl = `mongodb://${options.user}:${options.pass}@${options.host}:${options.port}/${options.db}`;
+                mongoUrl = `mongodb://${options.user}:${options.pass}@${options.host}:${options.port}`;
             } else {
-                mongoUrl = `mongodb://${options.host}:${options.port}/${options.db}`;
+                mongoUrl = `mongodb://${options.host}:${options.port}`;
             }
         }
-
+        if (isNotEmpty(options.search)) {
+            mongoUrl += '?' + Object.keys(options.search).map(k => `${k}=${options.search[k]}`).join('&');
+        }
         const connectFunc = () => {
             return MongoClient
                 .connect(mongoUrl, {useNewUrlParser: true})
