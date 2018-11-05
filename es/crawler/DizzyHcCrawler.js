@@ -42,6 +42,33 @@ class DizzyHcCrawler {
                 ErrorConsole('Crawler Catch Error', __filename, error);
             }),
         });
+        this.crawler.on('requeststarted', (options) => {
+            SuccessConsole('Crawler Catch HTML', __filename, `[HC START] \n\t${options.url}`);
+        });
+        this.crawler.on('requestskipped', (options) => {
+            SuccessConsole('Crawler Catch HTML', __filename, `[HC SKIP TO] \n\t${options.url}`);
+        });
+        this.crawler.on('requestfinished', (options) => {
+            SuccessConsole('Crawler Catch HTML', __filename, `[HC FINISH] \n\t${options.url}`);
+        });
+        this.crawler.on('requestretried', (options) => {
+            WarningConsole('Crawler Catch HTML', __filename, `[HC RETRIED] \n\t${options.url}`);
+        });
+        this.crawler.on('requestfailed', (err) => {
+            console.log(err)
+            ErrorConsole('Crawler Catch Error', __filename, `[HC FAILED] \n\t${JSON.stringify(err)}`);
+        });
+        this.crawler.on('maxdepthreached', (options) => {
+            ErrorConsole('Crawler Catch Error', __filename, `[HC FAILED] maxdepthreached \n\t${options.url}`);
+            this.close();
+        });
+        this.crawler.on('maxrequestreached', () => {
+            ErrorConsole('Crawler Catch Error', __filename, '[HC FAILED] maxrequestreached');
+            this.close();
+        });
+        this.crawler.on('disconnected', () => {
+            SuccessConsole('Crawler Catch HTML', __filename, '[HC DISCONNECTED] successful');
+        });
     }
 
     /**
