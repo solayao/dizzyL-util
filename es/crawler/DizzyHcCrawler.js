@@ -36,11 +36,11 @@ class DizzyHcCrawler {
             // Function to be called with evaluated results from browsers
             onSuccess: (rst => {
                 onSuccessCB(rst);
-                SuccessConsole('Crawler Catch HTML', __filename, `[GET ${rst.response.status}] \n\t${rst.response.url}\n\t${JSON.stringify(options)}`);
+                SuccessConsole('Crawler Catch HTML', __filename, `[GET ${rst.response.status}] \n\t${rst.response.url}`);
             }),
         });
         this.crawler.on('requeststarted', (options) => {
-            SuccessConsole('Crawler Catch HTML', __filename, `[HC START] \n\t${options.url}`);
+            SuccessConsole('Crawler Catch HTML', __filename, `[HC START] \n\t${options.url}\n\t${JSON.stringify(options)}`);
         });
         this.crawler.on('requestskipped', (options) => {
             SuccessConsole('Crawler Catch HTML', __filename, `[HC SKIP TO] \n\t${options.url}`);
