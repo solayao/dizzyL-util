@@ -29,17 +29,14 @@ class DizzyHcCrawler {
      * @param {*} { evaluatePage = {}, onSuccessCB = (rst) => {} }
      * @memberof DizzyHcCrawler
      */
-    async create({ evaluatePage = (() => ({})), onSuccessCB = (rst) => {} }) {
+    async create({ evaluatePage = (() => ({})), onSuccessCB = (rst) => {}, onErrorCB = () => {} }) {
         this.crawler = await HCCrawler.launch({
             // Function to be evaluated in browsers
             evaluatePage: evaluatePage,
             // Function to be called with evaluated results from browsers
             onSuccess: (rst => {
                 onSuccessCB(rst);
-                SuccessConsole('Crawler Catch HTML', __filename, `[GET ${rst.response.status}] \n\t${rst.response.url}`);
-            }),
-            onError: (error => {
-                ErrorConsole('Crawler Catch Error', __filename, error);
+                SuccessConsole('Crawler Catch HTML', __filename, `[GET ${rst.response.status}] \n\t${rst.response.url}\n\t${JSON.stringify(options)}`);
             }),
         });
         this.crawler.on('requeststarted', (options) => {
@@ -57,12 +54,10 @@ class DizzyHcCrawler {
         this.crawler.on('requestfailed', (err) => {
             console.log(err)
             ErrorConsole('Crawler Catch Error', __filename, `[HC FAILED] \n\t${JSON.stringify(err)}`);
+          	onErrorCB();
         });
         this.crawler.on('maxdepthreached', () => {
-            WarningConsole('Crawler Catch Error', __filename, '[HC FAILED] maxdepthreached');
-        });
-        this.crawler.on('maxrequestreached', () => {
-            ErrorConsole('Crawler Catch Error', __filename, '[HC FAILED] maxrequestreached');
+            SuccessConsole('Crawler Catch HTML', __filename, '[HC MAXDEPTHREACHED] maxdepthreached');
         });
         this.crawler.on('disconnected', () => {
             SuccessConsole('Crawler Catch HTML', __filename, '[HC DISCONNECTED] successful');
