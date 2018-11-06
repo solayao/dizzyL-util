@@ -1,14 +1,14 @@
 const regexMapper = require('./regex');
-const { Mongo, Redis } = require('./dbs');
+// const { Mongo, Redis } = require('./dbs');
 const { shallowClone, deepClone } = require('./object');
 const { timestampToTime, dateFormat } = require('./date');
 const { getPrototypeType, isNotEmpty } = require('./type');
 const { simplized, traditionalized } = require('./string/ChineseTransformation');
 const { getDistinctValuesOfArray, getRepeatedValuesOfArray, removeItem } = require('./array');
 const { trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString } = require('./string');
-const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./log/ChalkConsole');
+// const { Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole } = require('./log/ChalkConsole');
 const { flexible, SystemMess } = require('./system');
-const { C, HC } = require('./crawler');
+// const { C, HC } = require('./crawler');
 
 module.exports = {
   // 日期相关
@@ -17,9 +17,9 @@ module.exports = {
   simplized, traditionalized,
   trim, capitalize, capitalizeEveryWord, escapeRegExp, fromCamelCase, toCamelCase, reverseString,
   // 数据库相关
-  Mongo, Redis,
+  // Mongo, Redis,
   // 输入相关
-  Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole,
+  // Error, Success, Warning, ErrorConsole, SuccessConsole, WarningConsole, InsertConsole,
   // 正则相关
   regexMapper,
   // 类型相关
@@ -33,5 +33,5 @@ module.exports = {
   // 系统
   SystemMess,
   // 爬虫相关
-  C, HC
+  // C, HC
 }

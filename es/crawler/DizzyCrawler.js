@@ -22,6 +22,7 @@ class DizzyCrawler {
         const defaultOptions = {
             maxConnections: 20,
             callback: function (error, res, done) {
+                let $ = res.$;
                 if (error) {
                     ErrorConsole('Crawler catch', __filename, error);
                 } else {
@@ -38,6 +39,16 @@ class DizzyCrawler {
             WarningConsole('UnhandledRejection', __filename);
             console.log(p);
         });
+    }
+
+    /**
+     * @description 获取C实例
+     * @author Dizzy L
+     * @memberof DizzyCrawler
+     * @returns C实例 || null
+     */
+    getCrawler () {
+        return this.crawler;
     }
 
     /**
@@ -81,9 +92,7 @@ class DizzyCrawler {
             return new Promise((resolve, reject) => {
                 try {
                     const callback = async (error, res, done) => {
-                        if (error) {
-                            throw (error);
-                        }
+                        if (error) throw (error);
                         /** 基础的控制台信息 */
                         const baseTitle = `Crawler Catch ${isImage ? 'IMAGE' : 'HTML'}`;
                         const baseMess = `[${res.request.method} ${res.statusCode}] \n\t${catchUri}`;
@@ -167,56 +176,6 @@ class DizzyCrawler {
                 resolve();
             });
         }
-    }
-
-    /**
-     * @description 根据配置生成crawler任务,由于执行时间过长 待优化！！！！！！！！！！！
-     * @author Dizzy L
-     * @param {any} [optionList=[]] 
-     * @returns 
-     * @memberof DizzyCrawler
-     */
-    createCrawler(optionList = []) {
-        const list = optionList.map(o => {
-            const { crawlerType, crawlerOptions, catchObj } = o;
-            if (crawlerType === 'promise') {// 异步爬虫
-                return this.promiseQueue(crawlerOptions, (res) => {
-                    let $ = res.$;
-                    const { catchKey, catchFunc, catchReg, catchSuccActions } = catchObj;
-                    if (catchFunc === 'each') {// 捕获jq对象后要执行each方法
-                        $(catchKey).each((index, domEle) => {
-                            const content = $(domEle).html();
-
-                            let reg = this.regs.hasOwnProperty(catchReg) ? this.regs[catchReg] : catchReg;  // 判断是否是全局的Regs
-                            if (reg.test(content)) {// 成功匹配Reg
-                                let obj = {};    // 寄存action变量的Object
-
-                                catchSuccActions.forEach(action => {
-                                    const { actionType, actionName, actionFunc, actionProps, actionTo } = action;
-
-                                    if (actionType === 'eq') {
-                                        obj[actionTo] = '';
-                                    }
-                                    else if (actionType === 'if') {
-
-                                    }
-                                    else {// 一般情况往全局变量this.nextProps的属性actionName执行actionFunc方法, 如果actionProps包含$字符串取catchReg所匹配的第n个子匹配(以括号为标志)字符串
-                                        this.nextProps[actionName][actionFunc](actionProps.includes('$') ? RegExp[actionProps] : actionProps);
-                                    }
-                                })
-                            } else {// 匹配Reg失败
-                                console.log(`${catchKey}的第${index}个+配置[ ${reg} ]失败`);
-                            }
-                        });
-                    }
-                    else {// 捕获jq对象后要执行？？？？方法
-
-                    }
-                });
-            }
-        });
-
-        return Promise.all(list);
     }
 }
 

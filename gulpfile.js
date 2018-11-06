@@ -3,7 +3,7 @@ const babel = require('gulp-babel');
 const minify = require('gulp-minify');
 
 gulp.task('toes5', () =>
-	gulp.src('es/**/*.js')
+	gulp.src(['es/**/*.js', '!es/crawler/*.js', '!es/dbs/*.js', '!es/log/*.js'])
 		.pipe(babel({
 			presets: ['babel-preset-env'],
 			plugins: ['babel-plugin-transform-object-rest-spread']
@@ -13,7 +13,7 @@ gulp.task('toes5', () =>
 );
 
 gulp.task('copyJson', () => {
-	gulp.src('es/**/*.json')
+	gulp.src(['es/**/*.json', '!es/dbs/*.json', '!es/log/*.json'])
 		.pipe(gulp.dest('lib'))	
 });
 
