@@ -12,9 +12,9 @@
     },
     "app": {
       "type": "file",
-      "filename": "logFiles/app.log",
+      "filename": "logFiles/app/app.log",
       "maxLogSize": 10485760,
-      "numBackups": 3
+      "backups": 3
     },
     "errorFile": {
       "type": "file",
