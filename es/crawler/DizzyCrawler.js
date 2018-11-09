@@ -36,7 +36,7 @@ class DizzyCrawler {
 
         process.on('unhandledRejection', (error, p) => {
             // Will print "unhandledRejection err is not defined"
-            WarningConsole('UnhandledRejection', __filename);
+            WarningConsole('UnhandledRejection', __filename, JSON.stringify({p: error}));
             console.log(p);
         });
     }
