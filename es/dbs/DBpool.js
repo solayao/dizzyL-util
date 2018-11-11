@@ -23,9 +23,8 @@ class DBPool {
         }
         this.pool = genericPool.createPool(factory, opts);
 
-        process.on('unhandledRejection', (reason, p) => {
-            ErrorConsole('Unhandled Rejection At: Promise ', 'DBpool');
-            console.log(p);
+        process.on('unhandledRejection', (reason, promise) => {
+            ErrorConsole('Unhandled Rejection At: Promise ', 'DBpool', JSON.stringify({reason, promise}));
         });
     }
 
@@ -38,14 +37,15 @@ class DBPool {
      * @returns {Promise} actionFunc()结果
      */
     sqlAction(actionFunc = (dbClient) => emptyFunc(), filename = __filename) {
-        return this.pool.use(dbClient => actionFunc(dbClient))
+        return this.pool.use(dbClient => actionFunc(dbClient).catch(err => { throw err; }))
             .then(result => {
-                SuccessConsole('DBpool Message', filename, `Release 1 connection, pool.size is ${this.pool.size}, pool.available is ${this.pool.available}`)
+                SuccessConsole('DBpool Message', filename, `Release 1 connection, pool.size is ${this.pool.size}, pool.available is ${this.pool.available}`);
                 return result;    
             })
-            .catch(err => 
-                SuccessConsole('DBpool Message', filename, `Destroy 1 connection, pool.size is ${this.pool.size}, pool.available is ${this.pool.available}`)
-            );
+            .catch(err => {
+                ErrorConsole('SQLAction Error', filename, JSON.stringify(err));
+                SuccessConsole('DBpool Message', filename, `Destroy 1 connection, pool.size is ${this.pool.size}, pool.available is ${this.pool.available}`);
+            });
     }
 
     /**
