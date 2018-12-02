@@ -19,10 +19,8 @@
   "dependencies": {
     "bluebird": "^3.5.2",
     "chalk": "^2.4.1",
-    "crawler": "^1.2.0",
     "fbjs": "^1.0.0",
     "generic-pool": "^3.4.2",
-    "headless-chrome-crawler": "^1.8.0",
     "log4js": "^3.0.6",
     "mongodb": "^3.1.8",
     "redis": "^2.8.0",

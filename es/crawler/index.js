@@ -1,7 +1,7 @@
-const C = require('./DizzyCrawler');
-const HC = require('./DizzyHcCrawler');
+// const C = require('./DizzyCrawler');
+// const HC = require('./DizzyHcCrawler');
 
-module.exports = {
-    C,
-    HC,
-}
+// module.exports = {
+//     C,
+//     HC,
+// }
