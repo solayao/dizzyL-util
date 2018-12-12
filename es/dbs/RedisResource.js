@@ -1,10 +1,19 @@
 const Redis = require('redis');
 const bluebird = require('bluebird');
+const emptyFunc = require('fbjs/lib/emptyFunction');
 bluebird.promisifyAll(Redis);
 
 const DBpool = require('./DBpool');
 const {redisConfig} = require('./config.json');
 const {SuccessConsole, ErrorConsole} = require('../log/ChalkConsole');
+// const getLogger = require('../log/log4js');
+const {isNotEmpty} = require('../type');
+
+const getOpt = (message) => ({
+    title: 'DBpool message',
+    pathName: __filename,
+    message,
+});
 
 /**
  * @description Redis连接池
@@ -17,27 +26,31 @@ class RedisResource {
         const defaultOpt = {
             retry_strategy: function (options) {
                 if (options.error && options.error.code === 'ETIMEDOUT') {
-                    ErrorConsole(
-                        'DBpool message',
-                        __filename,
-                        `Connected MongoDB (${options.error.address}:${options.error.port}) NOT successfully to server!`
-                    );
+                    let opt = getOpt(`Connected MongoDB (${options.error.address}:${options.error.port}) NOT successfully to server!`);
+                    ErrorConsole(opt);
+                    opt = null;
                 }
                 if (options.error && options.error.code === 'ECONNREFUSED') {
                     // End reconnecting on a specific error and flush all commands with a individual
                     // error
-                    ErrorConsole('DBpool Message', __filename, `${options.error}`);
+                    let opt = getOpt(`${options.error}`);
+                    ErrorConsole(opt);
+                    opt = null;
                     return new Error('The server refused the connection');
                 }
                 if (options.total_retry_time > 1000 * 60 * 60) {
                     // End reconnecting after a specific timeout and flush all commands with a
                     // individual error
-                    ErrorConsole('DBpool Message', __filename, 'Retry time exhausted');
+                    let opt = getOpt('Retry time exhausted');
+                    ErrorConsole(opt);
+                    opt = null;
                     return new Error('Retry time exhausted');
                 }
                 if (options.attempt > 10) {
                     // End reconnecting with built in error
-                    ErrorConsole('DBpool Message', __filename, 'End reconnecting!');
+                    let opt = getOpt('End reconnecting!');
+                    ErrorConsole(opt);
+                    opt = null;
                     return undefined;
                 }
                 // reconnect after
@@ -47,29 +60,31 @@ class RedisResource {
         const connectFunc = () => {
             const redis = Redis.createClient(Object.assign({}, options, defaultOpt));
             redis.on("connect", function () {
-                SuccessConsole(
-                    'DBpool Message',
-                    __filename,
-                    `Connected Reids (${options.host}:${options.port}) successfully to server.`
-                );
+                let opt = getOpt(`Connected Reids (${options.host}:${options.port}) successfully to server.`);
+                SuccessConsole(opt);
+                opt = null;
             });
             return redis;
         };
         const disconnectFunc = async (client) => {
             await client.quit();
-            // await client.end(true);
-            SuccessConsole(
-                'DBpool Message',
-                __filename,
-                `Closed Reids (${options.host}:${options.port}) successfully to server.`
-            );
+            let opt = getOpt(`Closed Reids (${options.host}:${options.port}) successfully to server.`);
+            SuccessConsole(opt);
+            opt = null;
         };
 
-        this.redisPool = Object
-            .keys(poolOptions)
-            .length > 0
-                ? new DBpool(connectFunc, disconnectFunc, poolOptions)
-                : new DBpool(connectFunc, disconnectFunc);
+        this.redisPool = isNotEmpty(poolOptions) ? new DBpool(connectFunc, disconnectFunc, poolOptions)
+            : new DBpool(connectFunc, disconnectFunc);
+
+        process.on('unhandledRejection', (rejectReason, rejectPromise) => {
+            let opt = {
+                title: 'Unhandled Rejection At: Promise ',
+                pathName: __filename,
+                message: rejectReason.stack
+            }
+            ErrorConsole(opt);
+            opt = null;
+        });
     }
 
     /**
@@ -78,9 +93,7 @@ class RedisResource {
      * @memberof RedisResource
      */
     close() {
-        this
-            .redisPool
-            .closePool();
+        this.redisPool.closePool();
     }
 
     /**
@@ -90,9 +103,7 @@ class RedisResource {
      * @memberof MongoResource
      */
     action(actionFunc) {
-        return this
-            .redisPool
-            .sqlAction(actionFunc, __filename);
+        return this.redisPool.sqlAction(actionFunc, __filename);
     }
 
     /**
@@ -123,10 +134,7 @@ class RedisResource {
      * @memberof RedisResource
      */
     lRange(key = "", length = [0, -1]) {
-        return this.action(client => {
-            console.log(key, ...length)
-            return client.LRANGEAsync(key, ...length);
-        })
+        return this.action(client => client.LRANGEAsync(key, ...length))
     }
 
     /**
@@ -210,24 +218,25 @@ class RedisResource {
      * @returns
      * @memberof RedisResource
      */
-    actionForClient(promiseFunc = (client) => {}) {
-        return this.action(client => {
-            return promiseFunc(client);
-        })
+    actionForClient(promiseFunc = emptyFunc) {
+        return this.action(client => Promise.resolve(promiseFunc(client)))
     }
 }
 
 module.exports = RedisResource;
 
-// (async () => {     const r = new RedisResource(); await r.hmSet('test', {
-// param1: 'test1',     param2: 'test2' }); const r2 = new RedisResource();
-// await r2.hmSet('test3', {     param1: 'test1',     param2: 'test2' }); await
-// r.hmSet('test2', {     param1: 'test1',     param2: 'test2' }); await
-// r.close(); await r2.hmSet('test4', {     param1: 'test1',     param2: 'test2'
-// }); await r.hmSet('2015-1', {     param1: 'test1',     param2: 'test2' });
-// await r.hmSet('2016-1', {     param1: 'test1',     param2: 'test2' }); await
-// r.hmSet('2016-4', {     param1: 'test1',     param2: 'test2' }, 10000); await
-// r.hmSet('2016-5', {     param1: 'test1',     param2: 'test2' }); await
-// r.flushall(); console.log(await r.keys()); let fir = await
-// r.hgetAll(test[0]); console.log(await r.lRange('banzhuan_OneDay')) await
-// r.close(); })();
+// (async() => {
+    // const r = new RedisResource();     await r.hmSet('test', {         param1:
+    // 'test1',         param2: 'test2'     });     const r2 = new RedisResource();
+    // await r2.hmSet('test3', {         param1: 'test1',         param2: 'test2'
+    // });     await     r.hmSet('test2', {         param1: 'test1',         param2:
+    // 'test2'     });     await     r.close();     await r2.hmSet('test4', {
+    // param1: 'test1',         param2: 'test2'     });     await r.hmSet('2015-1',
+    // {         param1: 'test1',         param2: 'test2'     });     await
+    // r.hmSet('2016-1', {         param1: 'test1',         param2: 'test2'     });
+    // await     r.hmSet('2016-4', {         param1: 'test1',         param2:
+    // 'test2'     }, 10000);     await     r.hmSet('2016-5', {         param1:
+    // 'test1',         param2: 'test2'     });     await     r.flushall();     let
+    // fir = await     r.hgetAll(test[0]);     process.env.NODE_ENV = 'production';
+    // let opt = getOpt(await r.lRange('banzhuan_OneDay'));     WarningConsole(opt);
+    // getLogger(false).warn(opt.message)     opt = null;     r.close(); })();

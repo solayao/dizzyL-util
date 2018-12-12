@@ -3,7 +3,9 @@
  * @example key(输出的内容)
  */
 const chalk = require('chalk');
-const { logger, accessLogger, insertLogger } = require('./log4js');
+const getLogger = require('./log4js');
+const {getPrototypeType} = require('../type');
+let logger = getLogger();
 
 /**
  * @description 文字染色方法
@@ -11,13 +13,42 @@ const { logger, accessLogger, insertLogger } = require('./log4js');
  * @param {Function} Success 绿色成功渲染
  * @param {Function} Warning 橙色警告渲染
  */
-const Error = chalk.bold.red;
 const Success = chalk.bold.green;
-const MessBg = chalk.black.bgWhite;
 const Warning = chalk.keyword('orange');
+const Error = chalk.bold.red;
+const MessBg = chalk.black.bgWhite;
 
-const messStyle = (title = "title", pathName = __filename, message = "", titleChalk, pathNameChalk = Warning, messageChalk = MessBg) => {
-    return `${titleChalk(`[ ${title} | ${pathNameChalk(pathName.split('\\').pop())} ]`)} -- ${messageChalk(message)}`;
+const defaultStyle = {
+    title: '标题',
+    pathName: __filename,
+    message: '',
+    titleChalk: Success,
+    pathNameChalk: Warning
+}
+
+const defaultOpt = {
+    title: '测试标题',
+    pathName: __filename,
+    message: '内容'
+}
+
+/**
+ * @description 输入日志封装
+ * @param {*} option
+ * @default
+ * {
+        title: '标题',
+        pathName: __filename,
+        message: '',
+        titleChalk: Success,
+        pathNameChalk: Warning
+    }
+ * @returns
+ */
+const messStyle = (option = {}) => {
+    const {title, pathName, message, titleChalk, pathNameChalk} = {...defaultStyle, ...option};
+    let mess = ['Function', 'RegExp', 'Symbol'].includes(getPrototypeType(message)) ? message : MessBg(message);
+    return `${titleChalk(`[ ${title} | ${pathNameChalk(pathName.split('\\').pop())} ]`)} - \n${mess}`;
 }
 
 /**
@@ -26,13 +57,17 @@ const messStyle = (title = "title", pathName = __filename, message = "", titleCh
  * @param {*} pathName Warning出自
  * @param {*} message Warning信息
  */
-const WarningConsole = (title, pathName, message) => {
-    const mess = messStyle(title, pathName, message, Warning, Error);
-    if(process.env.NODE_ENV === 'production') {
-        logger.warn(mess);
-    } else {
-        console.log(mess);
+const WarningConsole = ({title, pathName, message} = defaultOpt) => {
+    let opt = {
+        title,
+        pathName,
+        message,
+        titleChalk: Warning,
+        pathNameChalk: Error
     }
+    let mess = messStyle(opt);
+    logger.warn(mess);
+    opt = mess = null;
 }
 
 /**
@@ -41,13 +76,16 @@ const WarningConsole = (title, pathName, message) => {
  * @param {*} pathName Success出自
  * @param {*} message Success信息
  */
-const SuccessConsole = (title, pathName, message) => {
-    const mess = messStyle(title, pathName, message, Success);
-    if(process.env.NODE_ENV === 'production') {
-        logger.warn(mess);
-    } else {
-        console.log(mess);
+const SuccessConsole = ({title, pathName, message} = defaultOpt) => {
+    let opt = {
+        title,
+        pathName,
+        message,
+        titleChalk: Success,
     }
+    let mess = messStyle(opt);
+    logger.info(mess);
+    opt = mess = null;
 }
 
 /**
@@ -56,36 +94,25 @@ const SuccessConsole = (title, pathName, message) => {
  * @param {*} pathName Error出自
  * @param {*} message Error信息
  */
-const ErrorConsole = (title, pathName, message = '') => {
-    const mess = messStyle(title, pathName, message, Error);
-    if(process.env.NODE_ENV === 'production') {
-        accessLogger.error(mess);
-    } else {
-        console.log(mess);
+const ErrorConsole = ({title, pathName, message} = defaultOpt) => {
+    let opt = {
+        title,
+        pathName,
+        message,
+        titleChalk: Error,
     }
-}
-
-/**
- * @description 插入/更新数据到数据库的输出封装
- * @param {*} title 标题
- * @param {*} pathName 出自
- * @param {*} message 信息
- */
-const InsertConsole = (title, pathName, message = '') => {
-    const mess = messStyle(title, pathName, message, Success);
-    if(process.env.NODE_ENV === 'production') {
-        insertLogger.info(mess);
-    } else {
-        console.log(mess);
-    }
+    let mess = messStyle(opt);
+    logger.error(mess);
+    opt = mess = null;
 }
 
 module.exports = {
+    messStyle,
     Error,
     Success,
     Warning,
     WarningConsole,
     SuccessConsole,
     ErrorConsole,
-    InsertConsole
 };
+

@@ -1,6 +1,7 @@
 const genericPool = require('generic-pool');
 const emptyFunc = require('fbjs/lib/emptyFunction');
 const { ErrorConsole, SuccessConsole } = require('../log/ChalkConsole');
+
 /**
  * @description 数据库连接池
  * @git https://github.com/coopernurse/node-pool
@@ -16,15 +17,21 @@ class DBPool {
      * @param {any} [opts={max: 10, min: 2}] 连接池配置项
      * @memberof DBPool
      */
-    constructor(connectFunc = emptyFunc, disconnectFunc = (client) => emptyFunc(), opts = { max: 20, min: 2 }) {
+    constructor(connectFunc = emptyFunc, disconnectFunc = emptyFunc, opts = { max: 20, min: 2 }) {
         const factory = {
             create: connectFunc,
             destroy: (client) => disconnectFunc(client),
         }
         this.pool = genericPool.createPool(factory, opts);
 
-        process.on('unhandledRejection', (reason, promise) => {
-            ErrorConsole('Unhandled Rejection At: Promise ', 'DBpool', JSON.stringify({reason, promise}));
+        process.on('unhandledRejection', (rejectReason, rejectPromise) => {
+            let opt = {
+                title: 'Unhandled Rejection At: Promise ',
+                pathName: __filename,
+                message: rejectReason
+            }
+            ErrorConsole(opt);
+            opt = null;
         });
     }
 
@@ -36,15 +43,17 @@ class DBPool {
      * @memberof DBPool
      * @returns {Promise} actionFunc()结果
      */
-    sqlAction(actionFunc = (dbClient) => emptyFunc(), filename = __filename) {
-        return this.pool.use(dbClient => actionFunc(dbClient).catch(err => { throw err; }))
+    sqlAction(actionFunc = emptyFunc, filename = __filename) {
+        return this.pool.use(dbClient => actionFunc(dbClient).catch(err => { throw new Error(err); }))
             .then(result => {
-                SuccessConsole('DBpool Message', filename, `Release 1 connection, pool.size is ${this.pool.size}, pool.available is ${this.pool.available}`);
+                let opt = {
+                    title: 'DBpool Message',
+                    pathName: filename,
+                    message: `Release 1 connection, pool.size is ${this.pool.size}, pool.available is ${this.pool.available}`
+                }
+                SuccessConsole(opt);
+                opt = null;
                 return result;    
-            })
-            .catch(err => {
-                ErrorConsole('SQLAction Error', filename, JSON.stringify(err));
-                SuccessConsole('DBpool Message', filename, `Destroy 1 connection, pool.size is ${this.pool.size}, pool.available is ${this.pool.available}`);
             });
     }
 
@@ -57,7 +66,6 @@ class DBPool {
         this.pool.drain()
             .then(() => {
                 this.pool.clear();
-                // SuccessConsole('Close DBpool Message', __filename, 'Successful!');
             });
     }
 }
