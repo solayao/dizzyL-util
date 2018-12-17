@@ -115,15 +115,15 @@ class RedisResource {
      * @memberof RedisResource
      */
     lPush(key = "", arr = [], expire = -1) {
-        return this.action(client => {
-            return client
-                .LPUSHAsync(key, ...arr)
-                .then(data => {
-                    if (expire !== -1) 
-                        client.EXPIREAsync(key, expire);
-                    return data;
-                });
-        })
+        if (!isNotEmpty(arr)) return [];
+
+        return this.action(client => client.LPUSHAsync(key, ...arr)
+            .then(data => {
+                if (expire !== -1) 
+                    client.EXPIREAsync(key, expire);
+                return data;
+            })
+        )
     }
 
     /**
@@ -146,9 +146,11 @@ class RedisResource {
      * @memberof RedisResource
      */
     hmSet(key = "", paramsObj, expire = -1) {
+        if (!isNotEmpty(paramsObj)) return null;
+
         return this.action(client => {
             return new Promise((resolve, reject) => {
-                if (key) 
+                if (key) {
                     client
                         .HMSETAsync(key, paramsObj)
                         .then(() => {
@@ -157,8 +159,10 @@ class RedisResource {
                             resolve();
                         })
                         .catch(err => reject(err));
+                } else {
+                    resolve();
                 }
-            );
+            });
         });
     }
 
@@ -170,16 +174,7 @@ class RedisResource {
      * @memberof RedisResource
      */
     hgetAll(key = "") {
-        return this.action(client => {
-            return new Promise((resolve, reject) => {
-                if (key) 
-                    client
-                        .HGETALLAsync(key)
-                        .then(data => resolve(data))
-                        .catch(err => reject('err', err));
-                }
-            );
-        });
+        return this.action(client => client.HGETALLAsync(key));
     }
 
     /**
@@ -190,14 +185,7 @@ class RedisResource {
      * @memberof RedisResource
      */
     keys(pattern = "*") {
-        return this.action(client => {
-            return new Promise((resolve, reject) => {
-                client
-                    .KEYSAsync(pattern)
-                    .then(data => resolve(data))
-                    .catch(err => reject('err', err));
-            })
-        });
+        return this.action(client => client.KEYSAsync(pattern));
     }
 
     /**
@@ -207,9 +195,7 @@ class RedisResource {
      * @memberof RedisResource
      */
     flushall() {
-        return this.action(client => {
-            return client.FLUSHALLAsync();
-        });
+        return this.action(client => client.FLUSHALLAsync());
     }
 
     /**
