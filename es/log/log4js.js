@@ -51,7 +51,7 @@ const getLogger = (isDev = !isPro) => {
                 appenders: ['console', 'dev', 'filterError'], level: 'debug'
             },
             crud: {
-                appenders: ['stdout', 'filterWarn', 'filterError'], level: 'info'
+                appenders: ['stdout', 'filterWarn', 'filterError'], level: 'debug'
             }
         }
     });

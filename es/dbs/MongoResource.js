@@ -2,9 +2,9 @@ const MongoDB = require('mongodb');
 const emptyFunc = require('fbjs/lib/emptyFunction');
 const MongoClient = MongoDB.MongoClient;
 const DBpool = require('./DBpool');
-const {mongoConfig, dbs} = require('./config.json');
-const {SuccessConsole, ErrorConsole, WarningConsole} = require('../log/ChalkConsole');
-const {isNotEmpty} = require('../type');
+const { mongoConfig, dbs } = require('./config.json');
+const { SuccessConsole, ErrorConsole, WarningConsole } = require('../log/ChalkConsole');
+const { isNotEmpty } = require('../type');
 
 const defaultDBName = dbs[0];
 const getOpt = (message) => ({
@@ -42,7 +42,7 @@ class MongoResource {
         }
         const connectFunc = () => {
             return MongoClient
-                .connect(mongoUrl, {useNewUrlParser: true})
+                .connect(mongoUrl, { useNewUrlParser: true })
                 .then(client => {
                     let opt = getOpt(`Connected MongoDB (${mongoUrl}) successfully to server.`);
                     SuccessConsole(opt);
@@ -105,9 +105,9 @@ class MongoResource {
      * @returns {Array} 插入到MongoDB的ids数组
      */
     actionInsert(collection = '', doc = null, dbName = defaultDBName) {
-        if (!doc || collection === '') 
+        if (!doc || collection === '')
             return;
-        if (Array.isArray(doc) && doc.length === 0) 
+        if (Array.isArray(doc) && doc.length === 0)
             return [];
         return this.action(client => {
             return new Promise((resolve, reject) => {
@@ -136,7 +136,7 @@ class MongoResource {
      * @returns {Array} 查询到的结果数组
      */
     actionQuery(collection = '', doc = null, dbName = defaultDBName) {
-        if (!doc || collection === '') 
+        if (!doc || collection === '')
             return;
         return this.action(client => {
             return new Promise((resolve, reject) => {
@@ -160,7 +160,7 @@ class MongoResource {
      * @returns {Array} 查询到的结果数组
      */
     actionAggregate(collection = '', doc = null, dbName = defaultDBName) {
-        if (!doc || collection === '') 
+        if (!doc || collection === '')
             return;
         return this.action(client => {
             return new Promise((resolve, reject) => {
@@ -193,21 +193,21 @@ class MongoResource {
         multi = false,
         dbName = defaultDBName
     ) {
-        if (!doc || !filter || !doc) 
+        if (!doc || !filter || !doc)
             return;
         return this.action(client => {
             return new Promise((resolve, reject) => {
                 client
                     .db(dbName)
                     .collection(collection)
-                    .update(filter, doc, {upsert, multi})
+                    .update(filter, doc, { upsert, multi })
                     .then(msg => {
                         let opt = getOpt(`Update (${JSON.stringify(doc)}) to (${collection}) successfully.`)
                         WarningConsole(opt);
                         opt = null;
                         resolve(msg);
                     })
-                });
+            });
         })
     }
 
@@ -245,22 +245,55 @@ class MongoResource {
 }
 
 module.exports = MongoResource;
-// mongo 删除重复项 db.comic.aggregate([     {         $group: { _id: {name:
-// '$n'},count: {$sum: 1},dups: {$addToSet: '$_id'}}     },     {
-// $match: {count: {$gt: 1}}     }   ]).forEach(function(doc){
-// doc.dups.shift();     doc.dups.forEach(function(d){
-// db.chapter.remove({_id: {$in: d.dM}});       db.chapter.remove({_id: {$in:
-// d.dO}});     });     db.comic.remove({_id: {$in: doc.dups}});   })
-// db.chpater.aggregate([     {         $group: { _id: {name: '$link'},count:
-// {$sum: 1},dups: {$addToSet: '$_id'}}     },     {         $match: {count:
-// {$gt: 1}}     }   ])
 
-// (async () => {
-//     const mongo = new MongoResource();
-//     await mongo.actionForClient(async client => new Promise(resovle => {
-//         let test = {};
-//         let a = test.db.length;
-//         resovle()
-//     }))
-//     await mongo.close();
-// })()
+// mongo 删除重复项
+// db.comic.aggregate([{
+//     $group: {
+//         _id: {
+//             name:
+//                 '$n'
+//         }, count: { $sum: 1 }, dups: { $addToSet: '$_id' }
+//     }
+// }, {
+//     $match: { count: { $gt: 1 } }
+// }]).forEach(function (doc) {
+//     doc.dups.shift();
+//     doc.dups.forEach(function (d) {
+//         db.chapter.remove({ _id: { $in: d.dM } });
+//         db.chapter.remove({ _id: { $in: d.dO } });
+//     });
+//     db.comic.remove({ _id: { $in: doc.dups } });
+// })
+
+// db.chapter.aggregate([{
+//     $group: {
+//         _id: { name: '$link' }, count:
+//             { $sum: 1 }, dups: { $addToSet: '$_id' }
+//     }
+// }, {
+//     $match: {
+//         count:
+//             { $gt: 1 }
+//     }
+// }])
+
+
+// let test1 = db.comic.aggregate([
+//     {$project: { dM:1, dO: 1 }},
+// ]).toArray().reduce(function(total, current){
+//     total = total.concat(current.dM, current.dO)
+//     return total;
+// }, []);
+// db.chapter.remove({ _id: { $nin: test1 } });
+// test1 = null;
+
+(async () => {
+    const mongo = new MongoResource();
+    let a = await mongo.actionForClient(client => client.db('crawlerDL').collection('comic')
+        .find()
+        .limit(1)
+        .toArray()
+    )
+    console.log(a);
+    await mongo.close();
+})()
