@@ -109,22 +109,20 @@ class MongoResource {
             return;
         if (Array.isArray(doc) && doc.length === 0) 
             return [];
-        return this.action(client => {
-            return new Promise((resolve, reject) => {
-                client
-                    .db(dbName)
-                    .collection(collection)
-                    .insert(doc)
-                    .then(msg => {
-                        if (msg.result.hasOwnProperty('ok')) {
-                            let opt = getOpt(`Insert (${JSON.stringify(doc)}) to (${collection}) successfully.`);
-                            WarningConsole(opt);
-                            opt = null;
-                            resolve(Object.values(msg.insertedIds));
-                        }
-                    })
-            });
-        });
+        return this.action(client => 
+            client
+                .db(dbName)
+                .collection(collection)
+                [Array.isArray(doc) ? 'insertMany' : 'insertOne'](doc)
+                .then(msg => {
+                    if (msg.result.hasOwnProperty('ok')) {
+                        let opt = getOpt(`Insert (${JSON.stringify(doc)}) to (${collection}) successfully.`);
+                        WarningConsole(opt);
+                        opt = null;
+                        return Object.values(msg.insertedIds);
+                    }
+                })
+        );
     }
     /**
      * @description Mongo数据库find操作
@@ -138,15 +136,13 @@ class MongoResource {
     actionQuery(collection = '', doc = null, dbName = defaultDBName) {
         if (!doc || collection === '') 
             return;
-        return this.action(client => {
-            return new Promise((resolve, reject) => {
-                client
-                    .db(dbName)
-                    .collection(collection)
-                    .find(doc)
-                    .toArray((err, msg) => resolve(msg))
-            });
-        });
+        return this.action(client =>
+            client
+                .db(dbName)
+                .collection(collection)
+                .find(doc)
+                .toArray()
+        );
     }
 
     /**
@@ -162,15 +158,13 @@ class MongoResource {
     actionAggregate(collection = '', doc = null, dbName = defaultDBName) {
         if (!doc || collection === '') 
             return;
-        return this.action(client => {
-            return new Promise((resolve, reject) => {
-                client
-                    .db(dbName)
-                    .collection(collection)
-                    .aggregate(doc)
-                    .toArray((err, msg) => resolve(msg))
-            });
-        });
+        return this.action(client => 
+             client
+                .db(dbName)
+                .collection(collection)
+                .aggregate(doc)
+                .toArray()
+        );
     }
 
     /**
@@ -195,20 +189,17 @@ class MongoResource {
     ) {
         if (!doc || !filter || !doc) 
             return;
-        return this.action(client => {
-            return new Promise((resolve, reject) => {
-                client
-                    .db(dbName)
-                    .collection(collection)
-                    .update(filter, doc, {upsert, multi})
-                    .then(msg => {
-                        let opt = getOpt(`Update (${JSON.stringify(doc)}) to (${collection}) successfully.`)
-                        WarningConsole(opt);
-                        opt = null;
-                        resolve(msg);
-                    })
-                });
-        })
+        return this.action(client => 
+            client
+                .db(dbName)
+                .collection(collection)
+                [multi ? 'updateMany' : 'updateOne'](filter, doc, {upsert})
+                .then(msg => {
+                    let opt = getOpt(`Update (${JSON.stringify(doc)}) to (${collection}) successfully.`)
+                    WarningConsole(opt);
+                    opt = null;
+                    return msg;
+                })
     }
 
     /**
@@ -227,19 +218,13 @@ class MongoResource {
      * @returns
      * @memberof MongoResource
      */
-    distinct() {
-        return this.action(client => {
-            return new Promise((resolve, reject) => {
-                client
-                    .db(dbName)
-                    .collection('comic')
-                    .distinct('n')
-                    .then(msg => {
-                        resolve(msg);
-                    })
-                    .catch(err => reject(err));
-            });
-        })
+    distinct(dbName = defaultDBName) {
+        return this.action(client =>
+            client
+                .db(dbName)
+                .collection('comic')
+                .distinct('n')
+        )
     }
 
 }
