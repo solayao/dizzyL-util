@@ -5,7 +5,7 @@ const minify = require('gulp-minify');
 gulp.task('toes5', () =>
 	gulp.src(['es/**/*.js', '!es/crawler/*.js', '!es/dbs/*.js', '!es/log/*.js'])
 		.pipe(babel({
-			presets: ['babel-preset-env'],
+			presets: ['es2015'],
 			plugins: ['babel-plugin-transform-object-rest-spread']
 		}))
 		.pipe(minify())
