@@ -6,7 +6,7 @@ const { mongoConfig, dbs } = require('./config.json');
 const { SuccessConsole, ErrorConsole, WarningConsole } = require('../log/ChalkConsole');
 const { isNotEmpty } = require('../type');
 
-const defaultDBName = dbs[0];
+let defaultDBName = dbs[0];
 const getOpt = (message) => ({
     title: 'DBpool message',
     pathName: __filename,
@@ -74,6 +74,15 @@ class MongoResource {
             ErrorConsole(opt);
             opt = null;
         });
+    }
+
+    /**
+     * @description 设置默认的操作db
+     * @author Dizzy L
+     * @memberof MongoResource
+     */
+    setDefaultDb(dbName) {
+        defaultDBName = dbName;
     }
 
     /**
