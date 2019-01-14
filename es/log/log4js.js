@@ -20,6 +20,8 @@ const getLogger = (isDev = !isPro) => {
             dev: {
                 type: 'file',
                 filename: 'logFiles/development.log',
+                maxLogSize:  10 * 1024 * 1024,
+                backups: 2,
             },
             crud: {
                 type: 'dateFile',
