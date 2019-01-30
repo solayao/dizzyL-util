@@ -1,6 +1,6 @@
 {
   "name": "dizzyl-util",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "dizzyL的个人公共工具包",
   "main": "index.js",
   "module": "es/index.js",
