@@ -128,7 +128,9 @@ class MongoResource {
                         let opt = getOpt(`Insert (${JSON.stringify(doc)}) to (${collection}) successfully.`);
                         WarningConsole(opt);
                         opt = null;
-                        return Object.values(msg.insertedIds);
+                        if (!!msg.insertedIds) return Object.values(msg.insertedIds); 
+                        if (!!msg.insertedId) return msg.insertedId;
+                        return null;
                     }
                 })
         );
