@@ -1,7 +1,7 @@
 const log4js = require('log4js');
-const isPro = process.env.NODE_ENV === 'production';
 
-const getLogger = (isDev = !isPro) => {
+const getLogger = () => {
+    let isPro = !!process.env.NODE_ENV && process.env.NODE_ENV.includes('pro');
     log4js.configure({
         replaceConsole: true,
         appenders: {
@@ -23,10 +23,11 @@ const getLogger = (isDev = !isPro) => {
                 maxLogSize:  10 * 1024 * 1024,
                 backups: 2,
             },
-            crud: {
+            prod: {
                 type: 'dateFile',
                 filename: 'logFiles/',
-                pattern: 'yyyy-MM-dd.crud.log',
+                pattern: 'yyyy-MM-dd.prod.log',
+                maxLogSize:  2 * 1024 * 1024,
                 alwaysIncludePattern: true,
                 daysToKeep: 30,
             },
@@ -34,30 +35,31 @@ const getLogger = (isDev = !isPro) => {
                 type: 'dateFile',
                 filename: 'logFiles/',
                 pattern: 'yyyy-MM-dd.error.log',
+                maxLogSize:  2 * 1024 * 1024,
                 alwaysIncludePattern: true,
                 daysToKeep: 30,
             },
             filterError: {
                 type: 'logLevelFilter',
                 level: 'error',
-                appender: 'justErrors'
+                appender: 'justErrors',
             },
             filterWarn: {
                 type: 'logLevelFilter',
                 level: 'warn',
-                appender: 'crud'
+                appender: 'prod',
             },
         },
         categories: {
             default: {
                 appenders: ['console', 'dev', 'filterError'], level: 'debug'
             },
-            crud: {
+            production: {
                 appenders: ['stdout', 'filterWarn', 'filterError'], level: 'debug'
             }
         }
     });
-    return log4js.getLogger(isDev ? 'default' : 'crud');
+    return log4js.getLogger(isPro ? 'production' : 'default');
 }
 
 module.exports = getLogger;

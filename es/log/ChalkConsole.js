@@ -84,7 +84,7 @@ const SuccessConsole = ({title, pathName, message} = defaultOpt) => {
         titleChalk: Success,
     }
     let mess = messStyle(opt);
-    logger.info(mess);
+    if (process.env.NODE_ENV !== 'production') logger.info(mess);
     opt = mess = null;
 }
 
@@ -115,4 +115,8 @@ module.exports = {
     SuccessConsole,
     ErrorConsole,
 };
+
+WarningConsole()
+SuccessConsole()
+ErrorConsole()
 

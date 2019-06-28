@@ -223,32 +223,6 @@ class MongoResource {
     actionForClient(promiseFunc = emptyFunc) {
         return this.action(client => Promise.resolve(promiseFunc(client)))
     }
-
-    /**
-     * 以n查询comic下的非重复集合
-     *
-     * @returns
-     * @memberof MongoResource
-     */
-    distinct(dbName = defaultDBName) {
-        return this.action(client =>
-            client
-                .db(dbName)
-                .collection('comic')
-                .distinct('n')
-        )
-    }
-
 }
 
 module.exports = MongoResource;
-
-// (async () => {
-//     const mongo = new MongoResource();
-//     await mongo.actionForClient(async client => new Promise(resovle => {
-//         let test = {};
-//         let a = test.db.length;
-//         resovle()
-//     }))
-//     await mongo.close();
-// })()
